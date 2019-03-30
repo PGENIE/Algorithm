@@ -1,29 +1,39 @@
 #include <iostream>
 #include <vector>
-#include <cstring>
 
 using namespace std;
+
 
 
 int main(void)
 {
 	int N, M;
 	int k = -1;
-	vector<int> numbers;
+	vector<int> v;
+	vector<int>::iterator iter;
 	cin >> N >> M;
 
 	for (int i = 0; i < N; i++)
-		numbers.push_back(i + 1);
+	{
+		v.push_back(i + 1);
+	}
 
 	cout << '<';
-	for (int i = 0; i < N; i++)
+	iter = v.begin();
+	while (v.size()!=1)
 	{
-		k += M;
-		cout << numbers[k%N];
-		cout << ',';
-		cout << " ";
+		for (int i = 0; i < M - 1; i++)
+		{
+			iter++;
+			if (iter == v.end())
+				iter = v.begin();
+		}
+		cout << *iter << ", ";
+		iter = v.erase(iter);
+		if (iter == v.end())
+			iter = v.begin();
 	}
-	cout << '>';
+	cout << *iter << '>';
 
 		return 0;
 }
