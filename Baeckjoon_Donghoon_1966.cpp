@@ -1,62 +1,52 @@
-#include <iostream>
+#include <cstdio>
 #include <queue>
+#pragma warning(disable :4996)
 
 using namespace std;
 
-int documents[100] = { 0, };
-int importance[100] = { 0, };
-int answer = 1;
-int temp;
-int on = 0;
-queue<int> q;
 int main(void)
 {
-	int test_case, N, M;
-	cin >> test_case >> N >> M;
-
-	for (int i = 0; i < test_case; i++)
+	int testcase;
+	scanf("%d", &testcase);
+	
+	for (int loop = 0; loop < testcase; loop++)
 	{
-		memset(documents, 0, sizeof(documents));
+		int N, M, answer = 0;
+		queue <pair<int, int>> q;
+		priority_queue <int> pq;
 
-		for (int h = 0; h < N; h++)
+		scanf("%d %d", &N, &M);
+
+		for (int i = 0; i < N; i++)
 		{
-			cin >> documents[h];
+			int temp;
+			scanf("%d", &temp);
+			q.push({ i,temp });
+			pq.push(temp);
 		}
 
-		for (int j = 0; j < M; j++)
+		while (!q.empty())
 		{
-			temp = q.front();
+			int nowidx = q.front().first;
+			int nowval = q.front().second;
 			q.pop();
-			q.push(temp);
-		}
 
-		temp = q.front();
-		q.pop();
-		while(!q.empty())
-		{
-			if (temp < q.front())
+			if (pq.top() == nowval)
 			{
+				pq.pop();
 				answer++;
-				on = 1;
+				if (nowidx == M)
+				{
+					printf("%d\n", answer);
+					break;
+				}
 			}
-			else if (temp == q.front() && on == 1)
-				answer++;
-			q.pop();
+			else {
+				q.push({ nowidx,nowval });
+			}
 		}
-		cout << answer << endl;
+		
+
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
 	return 0;
 }
