@@ -28,18 +28,14 @@ int main()
 	system("pause");
 }
 
-/* 왜틀린지 모르겠음
+/* 
 #include<stdio.h>
-#include<vector>
-#include<math.h>
-
-using namespace std;
 
 int testCase, n;
 
 int main()
 {
-	int result = 0 ;
+	long result = 0 ;
 	char tmp = 'a';
 	scanf("%d", &testCase);
 
@@ -51,7 +47,7 @@ int main()
 		while (1)
 		{
 			scanf("%c", &tmp);
-			if (tmp == '\n')
+			if (tmp < '0' || tmp>'9')
 			{
 				break;
 			}
