@@ -1,84 +1,96 @@
-#include<iostream>
+#include<stdio.h>
 #include<vector>
 #include<algorithm>
+#pragma warning(disable:4996)
 
 using namespace std;
-
-typedef struct element {
-	int y;
-	int x;
-	bool left = false;
-	bool right = false;
-}element;
-
-int n, m, h;
 
 typedef struct line {
 	int a;
 	int b;
 }line;
 
-vector<vector<int>> map; //연결되면 1 아니면 0
+typedef struct pos {
+	int y;
+	int x;
+}pos;
+
+vector<pos> added;
+vector<vector<int>> map;
 vector<vector<int>> mapCopy;
 vector<line> none;
-vector<line> exist;
+int n, m, h;
 
 bool goDown()
 {
 	int i, j;
-	int numtonum = 0 ;
-	vector<bool> result;
-	
-	for (i = 1; i < n + 1; i++)
-	{
-		int nowy, nowx;
-		nowy = 1; nowx = i;
+	bool checkResult = false;
 
-		while (nowy != h + 1)
+	for (i = 0; i <= n - 1; i++)
+	{
+		int nowx = i; int nowy = 0;
+
+		while (nowy != h)
 		{
-			bool move = false;
-			if (nowx != 1)//왼쪽 가기 가능한애들
+
+			if (nowy == h)
 			{
-				if (map[nowy][nowx-1] == 1)
-				{
-					nowx = nowx - 1; nowy++;
-					move = true;
-				}
+				break;
 			}
-			if (nowx != n && move == false)//오른쪽 가기 가능한애들
+
+			if (nowx == 0)//오른쪽만 무브 가능
 			{
 				if (map[nowy][nowx] == 1)
 				{
-					nowx++; nowy++;
-					move = true;
+					nowy++; nowx++;
+				}
+				else
+					nowy++;
+			}
+			else if (nowx == n - 1)//왼쪽만 무브 가능
+			{
+				if (map[nowy][nowx - 1] == 1)
+				{
+					nowy++; nowx--;
+				}
+				else nowy++;
+			}
+			else //양쪽 다 무브 가능
+			{
+				if (map[nowy][nowx] == 1)
+				{
+					nowy++; nowx++;
+				}
+				else if (map[nowy][nowx - 1] == 1)
+				{
+					nowy++; nowx--;
+				}
+				else
+				{
+					nowy++;
 				}
 			}
-			if(move == false)
-				nowy++;
-			
-		}
-		if (i == nowx)
-			numtonum++;
-		else
-		{
-			numtonum = 0;
-			break;
-		}
-	}
-	
-	if (numtonum == n)
-		return true;
-	else 
-		return false;
 
+		}
+		if (nowx == i)
+			continue;
+		else
+			return false;
+	}
+	return true;
 }
-bool addLine(int addCnt)
+bool addLine(int cnt)
 {
 	int i, j;
+	int addCnt = 0;
 
-	vector<int> coord(none.size());
-	
-	for (i = 0; i < addCnt; i++)
+	if (cnt > none.size())
+	{
+		return false;
+	}
+	vector<int> coord(none.size(), 0);
+
+	for (i = 0; i < cnt; i++)
 	{
 		coord[coord.size() - 1 - i] = 1;
 	}
@@ -86,16 +98,53 @@ bool addLine(int addCnt)
 	do {
 		for (i = 0; i < coord.size(); i++)
 		{
-			if (coord[i] == 1)
+			if (coord[i] == 1)//가로선 추가할 것
 			{
-				map[none[i].a][none[i].b] = 1;
+				if (none[i].b == 0)//오른쪽만 확인
+				{
+					if (map[none[i].a][none[i].b] == 0)
+					{
+						map[none[i].a][none[i].b] = 1;
+						addCnt++;
+					}
+
+				}
+				else if (none[i].b == n - 2)//왼쪽만 확인
+				{
+					if (map[none[i].a][none[i].b - 1] == 0)
+					{
+						map[none[i].a][none[i].b] = 1;
+						addCnt++;
+					}
+				}
+				else//오-왼 다확인
+				{
+					if (map[none[i].a][none[i].b - 1] == 0)
+					{
+						map[none[i].a][none[i].b] = 1;
+						addCnt++;
+					}
+					else if (map[none[i].a][none[i].b] == 0)
+					{
+						map[none[i].a][none[i].b] = 1;
+						addCnt++;
+					}
+				}
 			}
 		}
-		if (goDown() == true)
+		if (addCnt == cnt)
 		{
-			return true;
+
+			if (goDown() == true)
+			{
+				return true;
+			}
+
 		}
 		map = mapCopy;
+
+
+		addCnt = 0;
 	} while (next_permutation(coord.begin(), coord.end()));
 	return false;
 }
@@ -103,51 +152,42 @@ int main()
 {
 	int i, j;
 
-	cin >> n>> m>> h;
+	scanf("%d %d %d", &n, &m, &h);
 
-	map.resize(h + 1, vector<int>(n, 0));
+	map.resize(h, vector<int>(n - 1, 0));
 
-	for (i = 0; i < m; i++)//연결된 가로선 받아오기
+	for (i = 0; i < m; i++)
 	{
 		int a, b;
-		cin >> a>> b;
-		map[a][b] = 1;
+		scanf("%d %d", &a, &b);
+		map[a - 1][b - 1] = 1;
 	}
 	mapCopy = map;
 
-	//선 구분
-	for (i = 1; i < h + 1; i++)
+	for (i = 0; i < h; i++)
 	{
-		for (j = 1; j < n; j++)
+		for (j = 0; j < n - 1; j++)
 		{
 			if (map[i][j] == 0)
 			{
-				line l; l.a = i; l.b = j;
-				none.push_back(l);
-			}
-			else
-			{
-				line l; l.a = i; l.b = j;
-				exist.push_back(l);
+				none.push_back({ i,j });
 			}
 		}
 	}
-	
+
 	bool find = false;
-	//가로선 0개 ~ (n-1)*m - lineCnt 개만큼
-	//연결안된 선 목록에서 골라서 선 추가
-	//i->i인게 전부 확인되면, result받아서 break;
-	for (i = 0; i <= (n - 1)*h - exist.size(); i++)
+	for (i = 0; i <= 3; i++)
 	{
-		if (addLine(i))
+		if (addLine(i) == true)
 		{
 			find = true;
-			cout << i;
+			printf("%d", i);
 			break;
 		}
 	}
 	if (find == false)
-		cout << "-1";
+		printf("-1");
 
 	system("pause");
-}	
+
+}
